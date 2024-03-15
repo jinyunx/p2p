@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option go_package = "./;proto";
+package proto;
+
+enum ServerInfo {
+  ServerInfo_None = 0;
+  ServerInfo_Port = 50051;
+}
+
+message GetExternalIpPortReq {
+}
+
+message GetExternalIpPortResp {
+  string addr = 1;
+  string network = 2;
+}
+
+// The service definition.
+service P2P{
+  // 获取外网ip和端口
+  rpc GetExternalIpPort (GetExternalIpPortReq) returns (GetExternalIpPortResp) {}
+}
