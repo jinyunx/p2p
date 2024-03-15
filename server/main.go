@@ -22,6 +22,9 @@ func (s *server) GetExternalIpPort(ctx context.Context, in *pb.GetExternalIpPort
 
 func main() {
 	port := fmt.Sprintf(":%d", pb.ServerInfo_ServerInfo_Port)
+	go udpServer(port)
+
+	log.Println("Listen tcp rpc", port)
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)

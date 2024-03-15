@@ -16,6 +16,12 @@ message GetExternalIpPortResp {
   string network = 2;
 }
 
+message UDPAddr {
+  string ip = 1;
+  int32 port = 2;
+  string zone = 3; // IPv6 scoped addressing zone
+}
+
 // The service definition.
 service P2P{
   // 获取外网ip和端口
