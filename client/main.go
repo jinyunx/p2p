@@ -14,14 +14,62 @@ import (
 
 func main() {
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
-	if len(os.Args) != 2 {
+	if len(os.Args) != 3 {
 		log.Fatalf("usage:%s ip", os.Args[0])
 	}
 	ip := os.Args[1]
+	name := os.Args[2]
 
 	address := fmt.Sprintf("%s:%d", ip, pb.ServerInfo_ServerInfo_Port)
-	rpcRun(address)
-	udpRun(address)
+
+	var updAddr pb.UDPAddr
+	getExternalUdp(address, &updAddr)
+
+	updateNode(address, name, &updAddr)
+
+	var nodeInfo []*pb.NodeInfo
+	getNodeInfo(address, nodeInfo)
+}
+
+func getNodeInfo(address string, nodeInfo []*pb.NodeInfo) {
+	// Set up a connection to the server.
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+	c := pb.NewP2PClient(conn)
+
+	// Contact the server and print out its response.
+	r, err := c.GetNodeInfo(context.Background(), &pb.GetNodeInfoReq{})
+	if err != nil {
+		log.Fatalf("could not greet: %v", err)
+	}
+	log.Printf("Response: %s", r.String())
+	nodeInfo = r.GetNodeInfo()
+}
+
+func updateNode(address string, name string, updAddr *pb.UDPAddr) {
+	// Set up a connection to the server.
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+	c := pb.NewP2PClient(conn)
+
+	nodeInfo := &pb.NodeInfo{
+		Name:    name,
+		UdpAddr: updAddr,
+	}
+	// Contact the server and print out its response.
+	r, err := c.UpdateNode(context.Background(), &pb.UpdateNodeReq{
+		NodeInfo: nodeInfo,
+	})
+	if err != nil {
+		log.Fatalf("could not greet: %v", err)
+	}
+	log.Printf("Response: %s", r.String())
 }
 
 func rpcRun(address string) {
@@ -41,14 +89,13 @@ func rpcRun(address string) {
 	log.Printf("Response: %s", r.String())
 }
 
-func udpRun(address string) {
+func getExternalUdp(address string, updAddr *pb.UDPAddr) {
 	var buf = make([]byte, 512)
 	n, err := comm.UdpWriteAndRead(address, 5*time.Second, buf)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	updAddr := &pb.UDPAddr{}
 	err = proto.Unmarshal(buf[0:n], updAddr)
 	if err != nil {
 		log.Fatal(err)

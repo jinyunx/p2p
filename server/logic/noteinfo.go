@@ -19,6 +19,7 @@ func UpdateNode(ctx context.Context, in *pb.UpdateNodeReq) (*pb.UpdateNodeResp, 
 	nodeInfo.mu.Lock()
 	nodeInfo.nodes[in.GetNodeInfo().GetName()] = *in.GetNodeInfo()
 	nodeInfo.mu.Unlock()
+	log.Println(nodeInfo.nodes)
 	return &pb.UpdateNodeResp{}, nil
 }
 
@@ -29,9 +30,8 @@ func GetNodeInfo(ctx context.Context, in *pb.GetNodeInfoReq) (*pb.GetNodeInfoRes
 	nodesMap := nodeInfo.nodes
 	nodeInfo.mu.Unlock()
 
-	n := out.GetNodeInfo()
 	for k, _ := range nodesMap {
-		n = append(n, &pb.NodeInfo{
+		out.NodeInfo = append(out.NodeInfo, &pb.NodeInfo{
 			Name:    nodesMap[k].Name,
 			UdpAddr: nodesMap[k].UdpAddr,
 		})
