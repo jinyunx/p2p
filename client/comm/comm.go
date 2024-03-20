@@ -3,18 +3,25 @@ package comm
 import (
 	"log"
 	"net"
+	"strconv"
 	"time"
 )
 
-func UdpWriteAndRead(address string, timeout time.Duration, buf []byte) (int, error) {
+func UdpWriteAndRead(address string, lport int, timeout time.Duration, buf []byte) (int, error) {
 	udpAddr, err := net.ResolveUDPAddr("udp4", address)
 	if err != nil {
 		log.Println("Invalid server address:", err)
 		return 0, err
 	}
 
+	ludpAddr, err := net.ResolveUDPAddr("udp4", ":"+strconv.Itoa(lport))
+	if err != nil {
+		log.Println("Invalid server address:", err)
+		return 0, err
+	}
+
 	// 创建UDP连接
-	conn, err := net.DialUDP("udp", nil, udpAddr)
+	conn, err := net.DialUDP("udp", ludpAddr, udpAddr)
 	if err != nil {
 		log.Println("Error connecting to UDP server:", err)
 		return 0, err

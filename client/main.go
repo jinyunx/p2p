@@ -9,21 +9,26 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"os"
+	"strconv"
 	"time"
 )
 
 func main() {
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
-	if len(os.Args) != 3 {
-		log.Fatalf("usage:%s ip", os.Args[0])
+	if len(os.Args) != 4 {
+		log.Fatalf("usage:%s ip name lport", os.Args[0])
 	}
 	ip := os.Args[1]
 	name := os.Args[2]
+	lport, err := strconv.Atoi(os.Args[3])
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	address := fmt.Sprintf("%s:%d", ip, pb.ServerInfo_ServerInfo_Port)
 
 	var updAddr pb.UDPAddr
-	getExternalUdp(address, &updAddr)
+	getExternalUdp(address, lport, &updAddr)
 
 	updateNode(address, name, &updAddr)
 
@@ -72,26 +77,9 @@ func updateNode(address string, name string, updAddr *pb.UDPAddr) {
 	log.Printf("Response: %s", r.String())
 }
 
-func rpcRun(address string) {
-	// Set up a connection to the server.
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("did not connect: %v", err)
-	}
-	defer conn.Close()
-	c := pb.NewP2PClient(conn)
-
-	// Contact the server and print out its response.
-	r, err := c.GetExternalIpPort(context.Background(), &pb.GetExternalIpPortReq{})
-	if err != nil {
-		log.Fatalf("could not greet: %v", err)
-	}
-	log.Printf("Response: %s", r.String())
-}
-
-func getExternalUdp(address string, updAddr *pb.UDPAddr) {
+func getExternalUdp(address string, lport int, updAddr *pb.UDPAddr) {
 	var buf = make([]byte, 512)
-	n, err := comm.UdpWriteAndRead(address, 5*time.Second, buf)
+	n, err := comm.UdpWriteAndRead(address, lport, 5*time.Second, buf)
 	if err != nil {
 		log.Fatal(err)
 	}
