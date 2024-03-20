@@ -4,6 +4,7 @@ import (
 	"fmt"
 	pb "github.com/jinyunx/p2p/proto"
 	"google.golang.org/grpc/peer"
+	"log"
 )
 import "golang.org/x/net/context"
 
@@ -15,7 +16,7 @@ func GetExternalIpPort(ctx context.Context, in *pb.GetExternalIpPortReq) (*pb.Ge
 	}
 
 	// p.Addr是net.Addr类型，包含了IP地址和端口
-	fmt.Printf("Client IP address: %s\n", p.Addr.String())
+	log.Printf("Client IP address: %s\n", p.Addr.String())
 	return &pb.GetExternalIpPortResp{
 		Addr:    p.Addr.String(),
 		Network: p.Addr.Network(),
