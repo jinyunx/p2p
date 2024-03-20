@@ -22,8 +22,29 @@ message UDPAddr {
   string zone = 3; // IPv6 scoped addressing zone
 }
 
+message NodeInfo {
+  string name = 1;
+  UDPAddr udp_addr = 2;
+}
+
+message UpdateNodeReq {
+  NodeInfo Node_info = 1;
+}
+
+message UpdateNodeResp {
+}
+
+message GetNodeInfoReq {
+}
+
+message GetNodeInfoResp {
+  repeated NodeInfo node_info = 1;
+}
+
 // The service definition.
 service P2P{
   // 获取外网ip和端口
   rpc GetExternalIpPort (GetExternalIpPortReq) returns (GetExternalIpPortResp) {}
+  rpc UpdateNode (UpdateNodeReq) returns (UpdateNodeResp) {}
+  rpc GetNodeInfo (GetNodeInfoReq) returns (GetNodeInfoResp) {}
 }

@@ -222,6 +222,231 @@ func (x *UDPAddr) GetZone() string {
 	return ""
 }
 
+type NodeInfo struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name    string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	UdpAddr *UDPAddr `protobuf:"bytes,2,opt,name=udp_addr,json=udpAddr,proto3" json:"udp_addr,omitempty"`
+}
+
+func (x *NodeInfo) Reset() {
+	*x = NodeInfo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_p2p_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *NodeInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NodeInfo) ProtoMessage() {}
+
+func (x *NodeInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_p2p_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NodeInfo.ProtoReflect.Descriptor instead.
+func (*NodeInfo) Descriptor() ([]byte, []int) {
+	return file_p2p_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *NodeInfo) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *NodeInfo) GetUdpAddr() *UDPAddr {
+	if x != nil {
+		return x.UdpAddr
+	}
+	return nil
+}
+
+type UpdateNodeReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	NodeInfo *NodeInfo `protobuf:"bytes,1,opt,name=Node_info,json=NodeInfo,proto3" json:"Node_info,omitempty"`
+}
+
+func (x *UpdateNodeReq) Reset() {
+	*x = UpdateNodeReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_p2p_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateNodeReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateNodeReq) ProtoMessage() {}
+
+func (x *UpdateNodeReq) ProtoReflect() protoreflect.Message {
+	mi := &file_p2p_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateNodeReq.ProtoReflect.Descriptor instead.
+func (*UpdateNodeReq) Descriptor() ([]byte, []int) {
+	return file_p2p_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *UpdateNodeReq) GetNodeInfo() *NodeInfo {
+	if x != nil {
+		return x.NodeInfo
+	}
+	return nil
+}
+
+type UpdateNodeResp struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *UpdateNodeResp) Reset() {
+	*x = UpdateNodeResp{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_p2p_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateNodeResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateNodeResp) ProtoMessage() {}
+
+func (x *UpdateNodeResp) ProtoReflect() protoreflect.Message {
+	mi := &file_p2p_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateNodeResp.ProtoReflect.Descriptor instead.
+func (*UpdateNodeResp) Descriptor() ([]byte, []int) {
+	return file_p2p_proto_rawDescGZIP(), []int{5}
+}
+
+type GetNodeInfoReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *GetNodeInfoReq) Reset() {
+	*x = GetNodeInfoReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_p2p_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetNodeInfoReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetNodeInfoReq) ProtoMessage() {}
+
+func (x *GetNodeInfoReq) ProtoReflect() protoreflect.Message {
+	mi := &file_p2p_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetNodeInfoReq.ProtoReflect.Descriptor instead.
+func (*GetNodeInfoReq) Descriptor() ([]byte, []int) {
+	return file_p2p_proto_rawDescGZIP(), []int{6}
+}
+
+type GetNodeInfoResp struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	NodeInfo []*NodeInfo `protobuf:"bytes,1,rep,name=node_info,json=nodeInfo,proto3" json:"node_info,omitempty"`
+}
+
+func (x *GetNodeInfoResp) Reset() {
+	*x = GetNodeInfoResp{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_p2p_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetNodeInfoResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetNodeInfoResp) ProtoMessage() {}
+
+func (x *GetNodeInfoResp) ProtoReflect() protoreflect.Message {
+	mi := &file_p2p_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetNodeInfoResp.ProtoReflect.Descriptor instead.
+func (*GetNodeInfoResp) Descriptor() ([]byte, []int) {
+	return file_p2p_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *GetNodeInfoResp) GetNodeInfo() []*NodeInfo {
+	if x != nil {
+		return x.NodeInfo
+	}
+	return nil
+}
+
 var File_p2p_proto protoreflect.FileDescriptor
 
 var file_p2p_proto_rawDesc = []byte{
@@ -236,17 +461,40 @@ var file_p2p_proto_rawDesc = []byte{
 	0x69, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x70, 0x12, 0x12, 0x0a, 0x04,
 	0x70, 0x6f, 0x72, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04, 0x70, 0x6f, 0x72, 0x74,
 	0x12, 0x12, 0x0a, 0x04, 0x7a, 0x6f, 0x6e, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04,
-	0x7a, 0x6f, 0x6e, 0x65, 0x2a, 0x38, 0x0a, 0x0a, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x49, 0x6e,
-	0x66, 0x6f, 0x12, 0x13, 0x0a, 0x0f, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x49, 0x6e, 0x66, 0x6f,
-	0x5f, 0x4e, 0x6f, 0x6e, 0x65, 0x10, 0x00, 0x12, 0x15, 0x0a, 0x0f, 0x53, 0x65, 0x72, 0x76, 0x65,
-	0x72, 0x49, 0x6e, 0x66, 0x6f, 0x5f, 0x50, 0x6f, 0x72, 0x74, 0x10, 0x83, 0x87, 0x03, 0x32, 0x57,
+	0x7a, 0x6f, 0x6e, 0x65, 0x22, 0x49, 0x0a, 0x08, 0x4e, 0x6f, 0x64, 0x65, 0x49, 0x6e, 0x66, 0x6f,
+	0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04,
+	0x6e, 0x61, 0x6d, 0x65, 0x12, 0x29, 0x0a, 0x08, 0x75, 0x64, 0x70, 0x5f, 0x61, 0x64, 0x64, 0x72,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x55,
+	0x44, 0x50, 0x41, 0x64, 0x64, 0x72, 0x52, 0x07, 0x75, 0x64, 0x70, 0x41, 0x64, 0x64, 0x72, 0x22,
+	0x3d, 0x0a, 0x0d, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x71,
+	0x12, 0x2c, 0x0a, 0x09, 0x4e, 0x6f, 0x64, 0x65, 0x5f, 0x69, 0x6e, 0x66, 0x6f, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x4e, 0x6f, 0x64, 0x65,
+	0x49, 0x6e, 0x66, 0x6f, 0x52, 0x08, 0x4e, 0x6f, 0x64, 0x65, 0x49, 0x6e, 0x66, 0x6f, 0x22, 0x10,
+	0x0a, 0x0e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x73, 0x70,
+	0x22, 0x10, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x4e, 0x6f, 0x64, 0x65, 0x49, 0x6e, 0x66, 0x6f, 0x52,
+	0x65, 0x71, 0x22, 0x3f, 0x0a, 0x0f, 0x47, 0x65, 0x74, 0x4e, 0x6f, 0x64, 0x65, 0x49, 0x6e, 0x66,
+	0x6f, 0x52, 0x65, 0x73, 0x70, 0x12, 0x2c, 0x0a, 0x09, 0x6e, 0x6f, 0x64, 0x65, 0x5f, 0x69, 0x6e,
+	0x66, 0x6f, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x2e, 0x4e, 0x6f, 0x64, 0x65, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x08, 0x6e, 0x6f, 0x64, 0x65, 0x49,
+	0x6e, 0x66, 0x6f, 0x2a, 0x38, 0x0a, 0x0a, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x49, 0x6e, 0x66,
+	0x6f, 0x12, 0x13, 0x0a, 0x0f, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x49, 0x6e, 0x66, 0x6f, 0x5f,
+	0x4e, 0x6f, 0x6e, 0x65, 0x10, 0x00, 0x12, 0x15, 0x0a, 0x0f, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72,
+	0x49, 0x6e, 0x66, 0x6f, 0x5f, 0x50, 0x6f, 0x72, 0x74, 0x10, 0x83, 0x87, 0x03, 0x32, 0xd4, 0x01,
 	0x0a, 0x03, 0x50, 0x32, 0x50, 0x12, 0x50, 0x0a, 0x11, 0x47, 0x65, 0x74, 0x45, 0x78, 0x74, 0x65,
 	0x72, 0x6e, 0x61, 0x6c, 0x49, 0x70, 0x50, 0x6f, 0x72, 0x74, 0x12, 0x1b, 0x2e, 0x70, 0x72, 0x6f,
 	0x74, 0x6f, 0x2e, 0x47, 0x65, 0x74, 0x45, 0x78, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x49, 0x70,
 	0x50, 0x6f, 0x72, 0x74, 0x52, 0x65, 0x71, 0x1a, 0x1c, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e,
 	0x47, 0x65, 0x74, 0x45, 0x78, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x49, 0x70, 0x50, 0x6f, 0x72,
-	0x74, 0x52, 0x65, 0x73, 0x70, 0x22, 0x00, 0x42, 0x0a, 0x5a, 0x08, 0x2e, 0x2f, 0x3b, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x74, 0x52, 0x65, 0x73, 0x70, 0x22, 0x00, 0x12, 0x3b, 0x0a, 0x0a, 0x55, 0x70, 0x64, 0x61, 0x74,
+	0x65, 0x4e, 0x6f, 0x64, 0x65, 0x12, 0x14, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x55, 0x70,
+	0x64, 0x61, 0x74, 0x65, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x71, 0x1a, 0x15, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x65,
+	0x73, 0x70, 0x22, 0x00, 0x12, 0x3e, 0x0a, 0x0b, 0x47, 0x65, 0x74, 0x4e, 0x6f, 0x64, 0x65, 0x49,
+	0x6e, 0x66, 0x6f, 0x12, 0x15, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x47, 0x65, 0x74, 0x4e,
+	0x6f, 0x64, 0x65, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65, 0x71, 0x1a, 0x16, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x2e, 0x47, 0x65, 0x74, 0x4e, 0x6f, 0x64, 0x65, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65,
+	0x73, 0x70, 0x22, 0x00, 0x42, 0x0a, 0x5a, 0x08, 0x2e, 0x2f, 0x3b, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -262,21 +510,33 @@ func file_p2p_proto_rawDescGZIP() []byte {
 }
 
 var file_p2p_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_p2p_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_p2p_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_p2p_proto_goTypes = []interface{}{
 	(ServerInfo)(0),               // 0: proto.ServerInfo
 	(*GetExternalIpPortReq)(nil),  // 1: proto.GetExternalIpPortReq
 	(*GetExternalIpPortResp)(nil), // 2: proto.GetExternalIpPortResp
 	(*UDPAddr)(nil),               // 3: proto.UDPAddr
+	(*NodeInfo)(nil),              // 4: proto.NodeInfo
+	(*UpdateNodeReq)(nil),         // 5: proto.UpdateNodeReq
+	(*UpdateNodeResp)(nil),        // 6: proto.UpdateNodeResp
+	(*GetNodeInfoReq)(nil),        // 7: proto.GetNodeInfoReq
+	(*GetNodeInfoResp)(nil),       // 8: proto.GetNodeInfoResp
 }
 var file_p2p_proto_depIdxs = []int32{
-	1, // 0: proto.P2P.GetExternalIpPort:input_type -> proto.GetExternalIpPortReq
-	2, // 1: proto.P2P.GetExternalIpPort:output_type -> proto.GetExternalIpPortResp
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	3, // 0: proto.NodeInfo.udp_addr:type_name -> proto.UDPAddr
+	4, // 1: proto.UpdateNodeReq.Node_info:type_name -> proto.NodeInfo
+	4, // 2: proto.GetNodeInfoResp.node_info:type_name -> proto.NodeInfo
+	1, // 3: proto.P2P.GetExternalIpPort:input_type -> proto.GetExternalIpPortReq
+	5, // 4: proto.P2P.UpdateNode:input_type -> proto.UpdateNodeReq
+	7, // 5: proto.P2P.GetNodeInfo:input_type -> proto.GetNodeInfoReq
+	2, // 6: proto.P2P.GetExternalIpPort:output_type -> proto.GetExternalIpPortResp
+	6, // 7: proto.P2P.UpdateNode:output_type -> proto.UpdateNodeResp
+	8, // 8: proto.P2P.GetNodeInfo:output_type -> proto.GetNodeInfoResp
+	6, // [6:9] is the sub-list for method output_type
+	3, // [3:6] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_p2p_proto_init() }
@@ -321,6 +581,66 @@ func file_p2p_proto_init() {
 				return nil
 			}
 		}
+		file_p2p_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*NodeInfo); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_p2p_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateNodeReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_p2p_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateNodeResp); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_p2p_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetNodeInfoReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_p2p_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetNodeInfoResp); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -328,7 +648,7 @@ func file_p2p_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_p2p_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   3,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

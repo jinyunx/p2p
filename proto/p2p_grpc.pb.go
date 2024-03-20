@@ -20,6 +20,8 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	P2P_GetExternalIpPort_FullMethodName = "/proto.P2P/GetExternalIpPort"
+	P2P_UpdateNode_FullMethodName        = "/proto.P2P/UpdateNode"
+	P2P_GetNodeInfo_FullMethodName       = "/proto.P2P/GetNodeInfo"
 )
 
 // P2PClient is the client API for P2P service.
@@ -28,6 +30,8 @@ const (
 type P2PClient interface {
 	// 获取外网ip和端口
 	GetExternalIpPort(ctx context.Context, in *GetExternalIpPortReq, opts ...grpc.CallOption) (*GetExternalIpPortResp, error)
+	UpdateNode(ctx context.Context, in *UpdateNodeReq, opts ...grpc.CallOption) (*UpdateNodeResp, error)
+	GetNodeInfo(ctx context.Context, in *GetNodeInfoReq, opts ...grpc.CallOption) (*GetNodeInfoResp, error)
 }
 
 type p2PClient struct {
@@ -47,12 +51,32 @@ func (c *p2PClient) GetExternalIpPort(ctx context.Context, in *GetExternalIpPort
 	return out, nil
 }
 
+func (c *p2PClient) UpdateNode(ctx context.Context, in *UpdateNodeReq, opts ...grpc.CallOption) (*UpdateNodeResp, error) {
+	out := new(UpdateNodeResp)
+	err := c.cc.Invoke(ctx, P2P_UpdateNode_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *p2PClient) GetNodeInfo(ctx context.Context, in *GetNodeInfoReq, opts ...grpc.CallOption) (*GetNodeInfoResp, error) {
+	out := new(GetNodeInfoResp)
+	err := c.cc.Invoke(ctx, P2P_GetNodeInfo_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // P2PServer is the server API for P2P service.
 // All implementations must embed UnimplementedP2PServer
 // for forward compatibility
 type P2PServer interface {
 	// 获取外网ip和端口
 	GetExternalIpPort(context.Context, *GetExternalIpPortReq) (*GetExternalIpPortResp, error)
+	UpdateNode(context.Context, *UpdateNodeReq) (*UpdateNodeResp, error)
+	GetNodeInfo(context.Context, *GetNodeInfoReq) (*GetNodeInfoResp, error)
 	mustEmbedUnimplementedP2PServer()
 }
 
@@ -62,6 +86,12 @@ type UnimplementedP2PServer struct {
 
 func (UnimplementedP2PServer) GetExternalIpPort(context.Context, *GetExternalIpPortReq) (*GetExternalIpPortResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetExternalIpPort not implemented")
+}
+func (UnimplementedP2PServer) UpdateNode(context.Context, *UpdateNodeReq) (*UpdateNodeResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateNode not implemented")
+}
+func (UnimplementedP2PServer) GetNodeInfo(context.Context, *GetNodeInfoReq) (*GetNodeInfoResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNodeInfo not implemented")
 }
 func (UnimplementedP2PServer) mustEmbedUnimplementedP2PServer() {}
 
@@ -94,6 +124,42 @@ func _P2P_GetExternalIpPort_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _P2P_UpdateNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateNodeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(P2PServer).UpdateNode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: P2P_UpdateNode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(P2PServer).UpdateNode(ctx, req.(*UpdateNodeReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _P2P_GetNodeInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetNodeInfoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(P2PServer).GetNodeInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: P2P_GetNodeInfo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(P2PServer).GetNodeInfo(ctx, req.(*GetNodeInfoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // P2P_ServiceDesc is the grpc.ServiceDesc for P2P service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -104,6 +170,14 @@ var P2P_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetExternalIpPort",
 			Handler:    _P2P_GetExternalIpPort_Handler,
+		},
+		{
+			MethodName: "UpdateNode",
+			Handler:    _P2P_UpdateNode_Handler,
+		},
+		{
+			MethodName: "GetNodeInfo",
+			Handler:    _P2P_GetNodeInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
