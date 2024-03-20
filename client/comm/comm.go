@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func UdpWriteAndRead(address string, lport int, timeout time.Duration, buf []byte) (int, error) {
+func UdpWriteAndRead(address string, lport int, timeout time.Duration, message []byte, buf []byte) (int, error) {
 	udpAddr, err := net.ResolveUDPAddr("udp4", address)
 	if err != nil {
 		log.Println("Invalid server address:", err)
@@ -29,7 +29,6 @@ func UdpWriteAndRead(address string, lport int, timeout time.Duration, buf []byt
 	defer conn.Close()
 
 	// 发送消息到服务器
-	message := []byte("Hello UDP server!")
 	_, err = conn.Write(message)
 	if err != nil {
 		log.Println("Error sending message:", err)

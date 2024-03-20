@@ -32,11 +32,41 @@ func main() {
 
 	updateNode(address, name, &updAddr)
 
-	var nodeInfo []*pb.NodeInfo
-	getNodeInfo(address, nodeInfo)
+	sendToPeer(address, name, lport)
 }
 
-func getNodeInfo(address string, nodeInfo []*pb.NodeInfo) {
+func sendToPeer(address string, name string, lport int) {
+	for {
+		var target *pb.NodeInfo = nil
+
+		nodeInfo := getNodeInfo(address)
+		for _, node := range nodeInfo {
+			if node.Name != name {
+				target = node
+				break
+			}
+		}
+		if target == nil {
+			log.Println("no peer found")
+			time.Sleep(time.Second)
+			continue
+		}
+
+		peerAddr := fmt.Sprintf("%s:%d", target.UdpAddr.Ip, target.UdpAddr.Port)
+		message := []byte(fmt.Sprintf("hello %s, my name is %s", target.Name, name))
+		var buf = make([]byte, 512)
+
+		n, err := comm.UdpWriteAndRead(peerAddr, lport, 5*time.Second, message, buf)
+		if err != nil {
+			log.Println(err)
+		} else {
+			log.Println("response:", buf[:n])
+		}
+		time.Sleep(5 * time.Second)
+	}
+}
+
+func getNodeInfo(address string) []*pb.NodeInfo {
 	// Set up a connection to the server.
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
@@ -51,7 +81,7 @@ func getNodeInfo(address string, nodeInfo []*pb.NodeInfo) {
 		log.Fatalf("could not greet: %v", err)
 	}
 	log.Printf("Response: %s", r.String())
-	nodeInfo = r.GetNodeInfo()
+	return r.GetNodeInfo()
 }
 
 func updateNode(address string, name string, updAddr *pb.UDPAddr) {
@@ -79,7 +109,8 @@ func updateNode(address string, name string, updAddr *pb.UDPAddr) {
 
 func getExternalUdp(address string, lport int, updAddr *pb.UDPAddr) {
 	var buf = make([]byte, 512)
-	n, err := comm.UdpWriteAndRead(address, lport, 5*time.Second, buf)
+	message := []byte("Hello UDP server!")
+	n, err := comm.UdpWriteAndRead(address, lport, 5*time.Second, message, buf)
 	if err != nil {
 		log.Fatal(err)
 	}
