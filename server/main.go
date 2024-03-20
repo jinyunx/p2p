@@ -31,6 +31,7 @@ func (s *server) GetNodeInfo(ctx context.Context, in *pb.GetNodeInfoReq) (*pb.Ge
 }
 
 func main() {
+	log.SetFlags(log.Lshortfile | log.LstdFlags)
 	port := fmt.Sprintf(":%d", pb.ServerInfo_ServerInfo_Port)
 	go udpServer(port)
 

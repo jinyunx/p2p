@@ -1,8 +1,7 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
+	"github.com/golang/protobuf/proto"
 	pb "github.com/jinyunx/p2p/proto"
 	"log"
 	"net"
@@ -12,7 +11,7 @@ import (
 func udpServer(port string) {
 	udpAddr, err := net.ResolveUDPAddr("udp4", port)
 	if err != nil {
-		fmt.Println("Invalid address:", err)
+		log.Println("Invalid address:", err)
 		os.Exit(1)
 	}
 
@@ -20,12 +19,12 @@ func udpServer(port string) {
 	log.Println("Listen udp", port)
 	conn, err := net.ListenUDP("udp", udpAddr)
 	if err != nil {
-		fmt.Println("Error listening on UDP port:", err)
+		log.Println("Error listening on UDP port:", err)
 		os.Exit(1)
 	}
 	defer conn.Close()
 
-	fmt.Println("UDP server listening on port", port)
+	log.Println("UDP server listening on port", port)
 
 	// 无限循环，等待并处理数据
 	for {
@@ -44,22 +43,23 @@ func handleClient(conn *net.UDPConn) {
 	}
 
 	// 打印接收到的消息
-	fmt.Println("Received ", string(buf[0:n]), " from ", addr)
+	log.Println("Received ", string(buf[0:n]), " from ", addr)
 
-	udpAddr := pb.UDPAddr{
-		Ip:   string(addr.IP),
+	udpAddr := &pb.UDPAddr{
+		Ip:   addr.IP.String(),
 		Port: int32(addr.Port),
 		Zone: addr.Zone,
 	}
 
-	addrJson, err := json.Marshal(udpAddr)
+	marshalAddr, err := proto.Marshal(udpAddr)
 	if err != nil {
-		log.Println(err)
+		log.Println(udpAddr, err)
+		return
 	}
 
 	// 发送响应
-	_, err = conn.WriteToUDP(addrJson, addr)
+	_, err = conn.WriteToUDP(marshalAddr, addr)
 	if err != nil {
-		fmt.Println("Error sending response:", err)
+		log.Println("Error sending response:", err)
 	}
 }

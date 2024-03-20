@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/golang/protobuf/proto"
 	pb "github.com/jinyunx/p2p/proto"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -12,7 +13,7 @@ import (
 )
 
 func main() {
-
+	log.SetFlags(log.Lshortfile | log.LstdFlags)
 	if len(os.Args) != 2 {
 		log.Fatalf("usage:%s ip", os.Args[0])
 	}
@@ -43,14 +44,14 @@ func rpcRun(address string) {
 func udpRun(address string) {
 	udpAddr, err := net.ResolveUDPAddr("udp4", address)
 	if err != nil {
-		fmt.Println("Invalid server address:", err)
+		log.Println("Invalid server address:", err)
 		os.Exit(1)
 	}
 
 	// 创建UDP连接
 	conn, err := net.DialUDP("udp", nil, udpAddr)
 	if err != nil {
-		fmt.Println("Error connecting to UDP server:", err)
+		log.Println("Error connecting to UDP server:", err)
 		os.Exit(1)
 	}
 	defer conn.Close()
@@ -59,14 +60,14 @@ func udpRun(address string) {
 	message := []byte("Hello UDP server!")
 	_, err = conn.Write(message)
 	if err != nil {
-		fmt.Println("Error sending message:", err)
+		log.Println("Error sending message:", err)
 		os.Exit(1)
 	}
 
 	// 设置读取超时
 	err = conn.SetReadDeadline(time.Now().Add(5 * time.Second))
 	if err != nil {
-		fmt.Println("Error setting read deadline:", err)
+		log.Println("Error setting read deadline:", err)
 		os.Exit(1)
 	}
 
@@ -75,13 +76,18 @@ func udpRun(address string) {
 	n, err := conn.Read(buf[0:])
 	if err != nil {
 		if e, ok := err.(net.Error); ok && e.Timeout() {
-			fmt.Println("Read timeout:", err)
+			log.Println("Read timeout:", err)
 		} else {
-			fmt.Println("Error reading response:", err)
+			log.Println("Error reading response:", err)
 		}
 		os.Exit(1)
 	}
 
 	// 打印服务器响应
-	fmt.Println("Server response:", string(buf[0:n]))
+	updAddr := &pb.UDPAddr{}
+	err = proto.Unmarshal(buf[0:n], updAddr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Server response:", updAddr)
 }
