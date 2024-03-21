@@ -8,6 +8,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"log"
+	"net"
 	"os"
 	"strconv"
 	"time"
@@ -35,7 +36,49 @@ func main() {
 	sendToPeer(address, name, lport)
 }
 
+func recvUdp(conn *net.UDPConn) {
+	for {
+		var buf [8 * 1024]byte
+
+		// 读取数据
+		n, addr, err := conn.ReadFromUDP(buf[0:])
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		// 打印接收到的消息
+		log.Println("Received from ", addr, string(buf[:n]))
+	}
+}
+
+func getUdpConn(laddr string) (*net.UDPConn, error) {
+	udpAddr, err := net.ResolveUDPAddr("udp4", laddr)
+	if err != nil {
+		log.Println("Invalid address:", err)
+		return nil, err
+	}
+
+	// 创建UDP监听
+	log.Println("Listen udp", laddr)
+	conn, err := net.ListenUDP("udp", udpAddr)
+	if err != nil {
+		log.Println("Error listening on UDP port:", err)
+		return nil, err
+	}
+	return conn, err
+}
+
 func sendToPeer(address string, name string, lport int) {
+
+	conn, err := getUdpConn(":" + strconv.Itoa(lport))
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer conn.Close()
+
+	go recvUdp(conn)
+
 	for {
 		var target *pb.NodeInfo = nil
 
@@ -48,19 +91,24 @@ func sendToPeer(address string, name string, lport int) {
 		}
 		if target == nil {
 			log.Println("no peer found")
-			time.Sleep(time.Second)
+			time.Sleep(5 * time.Second)
 			continue
 		}
 
 		peerAddr := fmt.Sprintf("%s:%d", target.UdpAddr.Ip, target.UdpAddr.Port)
 		message := []byte(fmt.Sprintf("hello %s, my name is %s", target.Name, name))
-		var buf = make([]byte, 512)
 
-		n, err := comm.UdpWriteAndRead(peerAddr, lport, 5*time.Second, message, buf)
+		peerUdpAddr, err := net.ResolveUDPAddr("udp4", peerAddr)
 		if err != nil {
-			log.Println(err)
+			log.Println("Invalid server address:", err)
+			continue
+		}
+
+		n, err := conn.WriteToUDP(message, peerUdpAddr)
+		if err != nil {
+			log.Println("Error sending message:", err)
 		} else {
-			log.Println("response:", buf[:n])
+			log.Println("Has send:", n)
 		}
 		time.Sleep(5 * time.Second)
 	}
