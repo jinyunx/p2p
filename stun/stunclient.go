@@ -24,6 +24,6 @@ func BindingRequest(addr string) error {
 
 	var respStunMsg StunMsg
 	respStunMsg.UnMarshal(resp[:n])
-	//log.Println(respStunMsg)
+	log.Println(respStunMsg)
 	return nil
 }

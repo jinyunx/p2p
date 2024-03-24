@@ -16,11 +16,42 @@ const (
 
 const StunMsgHeaderLength = 20
 
+/*
+0                   1                   2                   3
+	0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Type                  |            Length             |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         Value (variable)                      ...
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
+
 type TLV struct {
 	Type   uint16
 	Length uint16
 	Value  []byte
 }
+
+type Attr interface {
+	GetType() uint16
+	GetLength() uint16
+	Marshal() []byte
+	UnMarshal([]byte) error
+}
+
+/*
+0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|0 0|     STUN Message Type     |         Message Length        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         Magic Cookie                          |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                     Transaction ID (96 bits)                  |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
 
 type StunMsg struct {
 	StunMsgType   uint16
@@ -62,7 +93,6 @@ func (s *StunMsg) UnMarshal(bin []byte) error {
 	index += 4
 	copy(s.TransactionID[:], bin[index:index+len(s.TransactionID)])
 	index += len(s.TransactionID)
-	log.Println(s)
 
 	for index < len(bin) {
 		if len(bin)-index < 4 {
@@ -105,4 +135,63 @@ func (s *StunMsg) Marshal() []byte {
 		index += len(v.Value)
 	}
 	return bin
+}
+
+/*
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|0 0 0 0 0 0 0 0|    Family     |         X-Port                |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                   X-Address (Obfuscated IP)                   |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
+
+const AttrType_XorMappedAddress uint16 = 0x0020
+
+type XorMappedAddressValue struct {
+	Type     uint16
+	Length   uint16
+	Family   uint16
+	XPort    uint16
+	XAddress uint32
+}
+
+func (x *XorMappedAddressValue) GetType() uint16 {
+	return x.Type
+}
+
+func (x *XorMappedAddressValue) GetLength() uint16 {
+	return x.Length
+}
+
+func (x *XorMappedAddressValue) Marshal() (t *TLV) {
+	t.Type = AttrType_XorMappedAddress
+	t.Length = 8
+	t.Value = make([]byte, t.Length)
+
+	index := 0
+	binary.BigEndian.PutUint16(t.Value[index:], x.Family)
+	index += 2
+	binary.BigEndian.PutUint16(t.Value[index:], x.XPort)
+	index += 2
+	binary.BigEndian.PutUint32(t.Value[index:], x.XAddress)
+	return t
+}
+
+func (x *XorMappedAddressValue) UnMarshal(t *TLV) (err error) {
+	if t.Type != AttrType_XorMappedAddress {
+		return fmt.Errorf("type(%v) is not AttrType_XorMappedAddress(%v)", t.Type, AttrType_XorMappedAddress)
+	}
+	if t.Length != 8 {
+		return fmt.Errorf("length(%v) is not 8", t.Length)
+	}
+
+	index := 0
+	x.Family = binary.BigEndian.Uint16(t.Value[index:])
+	index += 2
+	x.XPort = binary.BigEndian.Uint16(t.Value[index:])
+	index += 2
+	x.XAddress = binary.BigEndian.Uint32(t.Value[index:])
+	return nil
 }
