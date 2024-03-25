@@ -7,7 +7,17 @@ import (
 	"log"
 	"net"
 	"reflect"
+	"runtime"
 )
+
+func FmtErrorF(format string, a ...any) error {
+	_, file, line, ok := runtime.Caller(1) // 获取调用者的文件名和行号
+	if !ok {
+		return FmtErrorF(format, a...)
+	}
+	format = "(%s:%d)" + format
+	return FmtErrorF(format, file, line, a)
+}
 
 const (
 	StunMsgType_BindingRequest         uint16 = 0x0001
@@ -77,7 +87,7 @@ func InitStunMsg(stunMsgType uint16, attrs []Attr) (*StunMsg, error) {
 
 func (s *StunMsg) UnMarshal(bin []byte) error {
 	if len(bin) < StunMsgHeaderLength {
-		return fmt.Errorf("len(bin) < StunMsgHeaderLength:%v<%v", len(bin), StunMsgHeaderLength)
+		return FmtErrorF("len(bin) < StunMsgHeaderLength:%v<%v", len(bin), StunMsgHeaderLength)
 	}
 	index := 0
 	s.StunMsgType = binary.BigEndian.Uint16(bin[index:])
@@ -159,7 +169,7 @@ func UnMarshalAttrs(bin []byte) ([]Attr, error) {
 			break
 		}
 		if len(bin[index:]) < 4 {
-			return nil, fmt.Errorf("len(%v) < 4", len(bin[index:]))
+			return nil, FmtErrorF("len(%v) < 4", len(bin[index:]))
 		}
 
 		t := binary.BigEndian.Uint16(bin[index:])
@@ -177,7 +187,7 @@ func UnMarshalAttrs(bin []byte) ([]Attr, error) {
 			attrs = append(attrs, &x)
 			index += length
 		default:
-			return nil, fmt.Errorf("unknow type(%v)", t)
+			return nil, FmtErrorF("unknow type(%v)", t)
 		}
 	}
 	return attrs, nil
@@ -187,16 +197,17 @@ func MarshalAttrs(attrs []Attr, bin []byte) error {
 	for _, a := range attrs {
 		switch a.GetType() {
 		case AttrType_XorMappedAddress:
+		case AttrType_ChangeRequest:
 			b, err := a.Marshal()
 			if err != nil {
 				return err
 			}
 			if len(b) > len(bin) {
-				fmt.Errorf("len(b)%v > len(bin)%v", len(b), len(bin))
+				return FmtErrorF("len(b)%v > len(bin)%v", len(b), len(bin))
 			}
 			copy(bin, b)
 		default:
-			return fmt.Errorf("unknow type(%v)", a.GetType())
+			return FmtErrorF("unknow type(%v)", a.GetType())
 		}
 	}
 	return nil
@@ -213,7 +224,7 @@ func FiledMarshal(x interface{}) ([]byte, error) {
 
 	// 确保我们处理的是结构体
 	if val.Kind() != reflect.Struct {
-		return nil, fmt.Errorf("val.Kind() != reflect.Struct:%v!=%v", val.Kind(), reflect.Struct)
+		return nil, FmtErrorF("val.Kind() != reflect.Struct:%v!=%v", val.Kind(), reflect.Struct)
 	}
 	// 遍历结构体的所有字段
 	for i := 0; i < val.NumField(); i++ {
@@ -229,7 +240,7 @@ func FiledMarshal(x interface{}) ([]byte, error) {
 			binary.BigEndian.PutUint32(tmp, uint32(valueField.Uint()))
 			bin = append(bin, tmp...)
 		default:
-			return nil, fmt.Errorf("unkown filed type:%v", valueField.Kind())
+			return nil, FmtErrorF("unkown filed type:%v", valueField.Kind())
 		}
 	}
 
@@ -247,12 +258,12 @@ func FiledUnMarshal(bin []byte, x interface{}) (err error) {
 
 	// 确保我们处理的是结构体
 	if val.Kind() != reflect.Struct {
-		return fmt.Errorf("val.Kind() != reflect.Struct:%v!=%v", val.Kind(), reflect.Struct)
+		return FmtErrorF("val.Kind() != reflect.Struct:%v!=%v", val.Kind(), reflect.Struct)
 	}
 	// 遍历结构体的所有字段
 	for i := 0; i < val.NumField(); i++ {
 		if index >= len(bin) {
-			return fmt.Errorf("index >= len(bin):%v>=%v", index, len(bin))
+			return FmtErrorF("index >= len(bin):%v>=%v", index, len(bin))
 		}
 		// 获取字段的值
 		valueField := val.Field(i)
@@ -273,7 +284,7 @@ func FiledUnMarshal(bin []byte, x interface{}) (err error) {
 				valueField.SetUint(uint64(tmp))
 			}
 		default:
-			return fmt.Errorf("unkown filed type:%v", valueField.Kind())
+			return FmtErrorF("unkown filed type:%v", valueField.Kind())
 		}
 	}
 
@@ -350,6 +361,8 @@ func (x *XorMappedAddress) String() string {
 	str += fmt.Sprintf(",attrFamily(%v)", x.Family)
 	str += fmt.Sprintf(",attrXPort(%v)", x.XPort)
 	str += fmt.Sprintf(",attrXAddress(%v)", x.XAddress)
+	str += fmt.Sprintf(",port(%v)", x.GetPort())
+	str += fmt.Sprintf(",ip(%v)", x.GetIp())
 	return str
 }
 
@@ -363,10 +376,10 @@ func (c *ChangeRequest) Init(changeIp, changePort bool) {
 	c.Type = AttrType_ChangeRequest
 	c.Length = 4
 	if changeIp {
-		c.Flag |= c.Flag & 0x00000004
+		c.Flag |= 0x00000004
 	}
 	if changePort {
-		c.Flag |= c.Flag & 0x00000002
+		c.Flag |= 0x00000002
 	}
 }
 
