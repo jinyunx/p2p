@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"log"
+	"net"
 )
 
 const (
@@ -15,6 +16,7 @@ const (
 )
 
 const StunMsgHeaderLength = 20
+const StunMsgMagicCookie = 0x2112A442
 
 func GetStunMsgTypeString(t uint16) string {
 	switch t {
@@ -57,7 +59,7 @@ func InitStunMsg(stunMsgType uint16, attrs []Attr) (*StunMsg, error) {
 	s := &StunMsg{
 		StunMsgType:   stunMsgType,
 		MsgLength:     0,
-		MagicCookie:   0x2112A442,
+		MagicCookie:   StunMsgMagicCookie,
 		TransactionID: [12]byte{},
 		Attrs:         attrs,
 	}
@@ -289,6 +291,16 @@ func (x *XorMappedAddressValue) UnMarshal(bin []byte) (err error) {
 	index += 2
 	x.XAddress = binary.BigEndian.Uint32(bin[index:])
 	return nil
+}
+
+func (x *XorMappedAddressValue) GetIp() net.IP {
+	originalIP := make(net.IP, 4)
+	binary.BigEndian.PutUint32(originalIP, x.XAddress^StunMsgMagicCookie)
+	return originalIP
+}
+
+func (x *XorMappedAddressValue) GetPort() uint16 {
+	return x.XPort ^ uint16(StunMsgMagicCookie>>16)
 }
 
 func (x *XorMappedAddressValue) String() string {
