@@ -7,7 +7,11 @@ import (
 )
 
 func BindingRequest(addr string) error {
-	stunMsg, err := InitStunMsg(StunMsgType_BindingRequest, []Attr{})
+	var attrs []Attr
+	var changeRequest ChangeRequest
+	changeRequest.Init(true, true)
+	attrs = append(attrs, &changeRequest)
+	stunMsg, err := InitStunMsg(StunMsgType_BindingRequest, attrs)
 	if err != nil {
 		log.Println(err)
 		return err

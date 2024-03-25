@@ -291,11 +291,14 @@ func FiledUnMarshal(bin []byte, x interface{}) (err error) {
 */
 
 const AttrType_XorMappedAddress uint16 = 0x0020
+const AttrType_ChangeRequest uint16 = 0x0003
 
 func GetAttrTypeString(t uint16) string {
 	switch t {
 	case AttrType_XorMappedAddress:
 		return "AttrType_XorMappedAddress"
+	case AttrType_ChangeRequest:
+		return "AttrType_ChangeRequest"
 	default:
 		return "unknown stun message type"
 	}
@@ -347,5 +350,55 @@ func (x *XorMappedAddress) String() string {
 	str += fmt.Sprintf(",attrFamily(%v)", x.Family)
 	str += fmt.Sprintf(",attrXPort(%v)", x.XPort)
 	str += fmt.Sprintf(",attrXAddress(%v)", x.XAddress)
+	return str
+}
+
+type ChangeRequest struct {
+	Type   uint16
+	Length uint16
+	Flag   uint32
+}
+
+func (c *ChangeRequest) Init(changeIp, changePort bool) {
+	c.Type = AttrType_ChangeRequest
+	c.Length = 4
+	if changeIp {
+		c.Flag |= c.Flag & 0x00000004
+	}
+	if changePort {
+		c.Flag |= c.Flag & 0x00000002
+	}
+}
+
+func (c *ChangeRequest) GetType() uint16 {
+	return c.Type
+}
+
+func (c *ChangeRequest) GetLength() uint16 {
+	return c.Length
+}
+
+func (c *ChangeRequest) Marshal() ([]byte, error) {
+	return FiledMarshal(c)
+}
+
+func (c *ChangeRequest) UnMarshal(bin []byte) (err error) {
+	return FiledUnMarshal(bin, c)
+}
+
+func (c *ChangeRequest) IsChangeIp() bool {
+	return c.Flag&0x00000004 != 0
+}
+
+func (c *ChangeRequest) IsChangePort() bool {
+	return c.Flag&0x00000002 != 0
+}
+
+func (c *ChangeRequest) String() string {
+	var str string
+	str = fmt.Sprintf("attrType(%v)%s", c.Type, GetAttrTypeString(c.Type))
+	str += fmt.Sprintf(",attrLength(%v)", c.Length)
+	str += fmt.Sprintf(",IsChangeIp(%v)", c.IsChangeIp())
+	str += fmt.Sprintf(",IsChangePort(%v)", c.IsChangePort())
 	return str
 }
