@@ -168,7 +168,7 @@ func UnMarshalAttrs(bin []byte) ([]Attr, error) {
 
 		switch t {
 		case AttrType_XorMappedAddress:
-			var x XorMappedAddressValue
+			var x XorMappedAddress
 			x.Init()
 			err := x.UnMarshal(bin[index : index+length])
 			if err != nil {
@@ -301,7 +301,7 @@ func GetAttrTypeString(t uint16) string {
 	}
 }
 
-type XorMappedAddressValue struct {
+type XorMappedAddress struct {
 	Type     uint16
 	Length   uint16
 	Family   uint16
@@ -309,38 +309,38 @@ type XorMappedAddressValue struct {
 	XAddress uint32
 }
 
-func (x *XorMappedAddressValue) Init() {
+func (x *XorMappedAddress) Init() {
 	x.Type = AttrType_XorMappedAddress
 	x.Length = 8
 }
 
-func (x *XorMappedAddressValue) GetType() uint16 {
+func (x *XorMappedAddress) GetType() uint16 {
 	return x.Type
 }
 
-func (x *XorMappedAddressValue) GetLength() uint16 {
+func (x *XorMappedAddress) GetLength() uint16 {
 	return x.Length
 }
 
-func (x *XorMappedAddressValue) Marshal() ([]byte, error) {
+func (x *XorMappedAddress) Marshal() ([]byte, error) {
 	return FiledMarshal(x)
 }
 
-func (x *XorMappedAddressValue) UnMarshal(bin []byte) (err error) {
+func (x *XorMappedAddress) UnMarshal(bin []byte) (err error) {
 	return FiledUnMarshal(bin, x)
 }
 
-func (x *XorMappedAddressValue) GetIp() net.IP {
+func (x *XorMappedAddress) GetIp() net.IP {
 	originalIP := make(net.IP, 4)
 	binary.BigEndian.PutUint32(originalIP, x.XAddress^StunMsgMagicCookie)
 	return originalIP
 }
 
-func (x *XorMappedAddressValue) GetPort() uint16 {
+func (x *XorMappedAddress) GetPort() uint16 {
 	return x.XPort ^ uint16(StunMsgMagicCookie>>16)
 }
 
-func (x *XorMappedAddressValue) String() string {
+func (x *XorMappedAddress) String() string {
 	var str string
 	str = fmt.Sprintf("attrType(%v)%s", x.Type, GetAttrTypeString(x.Type))
 	str += fmt.Sprintf(",attrLength(%v)", x.Length)

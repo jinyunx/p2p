@@ -36,7 +36,7 @@ func BindingRequest(addr string) error {
 	}
 	log.Println(respStunMsg)
 	for _, a := range respStunMsg.Attrs {
-		x, ok := a.(*XorMappedAddressValue)
+		x, ok := a.(*XorMappedAddress)
 		if ok {
 			log.Println(x.GetIp())
 			log.Println(x.GetPort())
