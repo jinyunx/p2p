@@ -212,25 +212,27 @@ func FiledMarshal(x interface{}) ([]byte, error) {
 	val = val.Elem()
 
 	// 确保我们处理的是结构体
-	if val.Kind() == reflect.Struct {
-		// 遍历结构体的所有字段
-		for i := 0; i < val.NumField(); i++ {
-			// 获取字段
-			valueField := val.Field(i)
-			switch valueField.Kind() {
-			case reflect.Uint16:
-				tmp := make([]byte, 2)
-				binary.BigEndian.PutUint16(tmp, uint16(valueField.Uint()))
-				bin = append(bin, tmp...)
-			case reflect.Uint32:
-				tmp := make([]byte, 4)
-				binary.BigEndian.PutUint32(tmp, uint32(valueField.Uint()))
-				bin = append(bin, tmp...)
-			default:
-				return nil, fmt.Errorf("unkown filed type:%v", valueField.Kind())
-			}
+	if val.Kind() != reflect.Struct {
+		return nil, fmt.Errorf("val.Kind() != reflect.Struct:%v!=%v", val.Kind(), reflect.Struct)
+	}
+	// 遍历结构体的所有字段
+	for i := 0; i < val.NumField(); i++ {
+		// 获取字段
+		valueField := val.Field(i)
+		switch valueField.Kind() {
+		case reflect.Uint16:
+			tmp := make([]byte, 2)
+			binary.BigEndian.PutUint16(tmp, uint16(valueField.Uint()))
+			bin = append(bin, tmp...)
+		case reflect.Uint32:
+			tmp := make([]byte, 4)
+			binary.BigEndian.PutUint32(tmp, uint32(valueField.Uint()))
+			bin = append(bin, tmp...)
+		default:
+			return nil, fmt.Errorf("unkown filed type:%v", valueField.Kind())
 		}
 	}
+
 	return bin, nil
 }
 
@@ -244,35 +246,37 @@ func FiledUnMarshal(bin []byte, x interface{}) (err error) {
 	val = val.Elem()
 
 	// 确保我们处理的是结构体
-	if val.Kind() == reflect.Struct {
-		// 遍历结构体的所有字段
-		for i := 0; i < val.NumField(); i++ {
-			if index >= len(bin) {
-				return fmt.Errorf("index >= len(bin):%v>=%v", index, len(bin))
-			}
-			// 获取字段的值
-			valueField := val.Field(i)
+	if val.Kind() != reflect.Struct {
+		return fmt.Errorf("val.Kind() != reflect.Struct:%v!=%v", val.Kind(), reflect.Struct)
+	}
+	// 遍历结构体的所有字段
+	for i := 0; i < val.NumField(); i++ {
+		if index >= len(bin) {
+			return fmt.Errorf("index >= len(bin):%v>=%v", index, len(bin))
+		}
+		// 获取字段的值
+		valueField := val.Field(i)
 
-			// 你可以在这里对字段进行操作
-			// 例如，你可以检查字段的类型，并根据类型执行不同的操作
-			switch valueField.Kind() {
-			case reflect.Uint16:
-				if valueField.CanSet() {
-					tmp := binary.BigEndian.Uint16(bin[index:])
-					index += 2
-					valueField.SetUint(uint64(tmp))
-				}
-			case reflect.Uint32:
-				if valueField.CanSet() {
-					tmp := binary.BigEndian.Uint32(bin[index:])
-					index += 4
-					valueField.SetUint(uint64(tmp))
-				}
-			default:
-				return fmt.Errorf("unkown filed type:%v", valueField.Kind())
+		// 你可以在这里对字段进行操作
+		// 例如，你可以检查字段的类型，并根据类型执行不同的操作
+		switch valueField.Kind() {
+		case reflect.Uint16:
+			if valueField.CanSet() {
+				tmp := binary.BigEndian.Uint16(bin[index:])
+				index += 2
+				valueField.SetUint(uint64(tmp))
 			}
+		case reflect.Uint32:
+			if valueField.CanSet() {
+				tmp := binary.BigEndian.Uint32(bin[index:])
+				index += 4
+				valueField.SetUint(uint64(tmp))
+			}
+		default:
+			return fmt.Errorf("unkown filed type:%v", valueField.Kind())
 		}
 	}
+
 	return nil
 }
 
