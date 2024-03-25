@@ -7,13 +7,19 @@ import (
 )
 
 func BindingRequest(addr string) error {
-	stunMsg, err := InitStunMsg(StunMsgType_BindingRequest, []TLV{})
+	stunMsg, err := InitStunMsg(StunMsgType_BindingRequest, []Attr{})
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 	log.Println(stunMsg)
-	bin := stunMsg.Marshal()
+
+	bin, err := stunMsg.Marshal()
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
 	var resp [1024]byte
 	n, err := comm.UdpWriteAndRead(addr, 12345, time.Second, bin, resp[:])
 	if err != nil {
@@ -23,7 +29,11 @@ func BindingRequest(addr string) error {
 	log.Println(n, resp[:n])
 
 	var respStunMsg StunMsg
-	respStunMsg.UnMarshal(resp[:n])
-	log.Println(respStunMsg)
+	err = respStunMsg.UnMarshal(resp[:n])
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	log.Println(respStunMsg.String())
 	return nil
 }
