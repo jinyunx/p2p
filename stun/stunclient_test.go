@@ -7,5 +7,5 @@ import (
 
 func TestBindingRequest(t *testing.T) {
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
-	BindingRequest("stun.l.google.com:19302")
+	BindingRequest("stun.qq.com:3478")
 }

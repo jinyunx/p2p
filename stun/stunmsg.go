@@ -176,6 +176,10 @@ func UnMarshalAttrs(bin []byte) ([]Attr, error) {
 		l := binary.BigEndian.Uint16(bin[index+2:])
 		length := int(l + 4)
 
+		if length > len(bin)-index {
+			return nil, FmtErrorF("length > len(bin)-index:%v>%v", length, len(bin)-index)
+		}
+
 		switch t {
 		case AttrType_XorMappedAddress:
 			var x XorMappedAddress
